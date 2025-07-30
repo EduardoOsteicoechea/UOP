@@ -11,7 +11,7 @@ namespace UOP
 	internal static class TESTS
 	{
 
-		public static TESTRESULT<T1, T2> CastCollectorItemsToList<T1, T2>
+		public static TESTRESULT CastCollectorItemsToList
 		(
 			dynamic argument
 		)
@@ -20,16 +20,16 @@ namespace UOP
 
 			if (result == null)
 			{
-				return TESTRESULTS.GenerictFailure<T1, T2>();
+				return TESTRESULTS.GenerictFailure();
 			}
 			else
 			{
-				return TESTRESULTS.GenericSuccessCollection<T1, T2>(result);
+				return TESTRESULTS.GenericSuccessCollection(result);
 			}
 		}
 
 
-		public static TESTRESULT<T1, T2> SimpleValue<T1, T2>
+		public static TESTRESULT SimpleValue
 		(
 			bool argument
 		)
@@ -38,32 +38,32 @@ namespace UOP
 
 			if (result == null)
 			{
-				return TESTRESULTS.GenerictFailure<T1, T2>();
+				return TESTRESULTS.GenerictFailure();
 			}
 			else
 			{
-				return TESTRESULTS.GenericSuccess<T1, T2>(result);
+				return TESTRESULTS.GenericSuccess(result);
 			}
 		}
 
 
-		public static TESTRESULT<T1, T2> NullableBool<T1, T2>
+		public static TESTRESULT NullableBool
 		(
 			bool? argument
 		)
 		{
 			if (argument == null)
 			{
-				return TESTRESULTS.GenerictFailure<T1, T2>();
+				return TESTRESULTS.GenerictFailure();
 			}
 			else
 			{
-				return TESTRESULTS.GenericSuccess<T1, T2>(argument);
+				return TESTRESULTS.GenericSuccess(argument);
 			}
 		}
 
 
-		public static TESTRESULT<T1, T2> ContainsItems<T1, T2>
+		public static TESTRESULT ContainsItems
 		(
 			bool argument
 		)
@@ -72,40 +72,40 @@ namespace UOP
 
 			if (result == null)
 			{
-				return TESTRESULTS.GenerictFailure<T1, T2>();
+				return TESTRESULTS.GenerictFailure();
 			}
 			if (result == default)
 			{
-				return TESTRESULTS.GenerictFailure<T1, T2>();
+				return TESTRESULTS.GenerictFailure();
 			}
 			else
 			{
-				return TESTRESULTS.GenericSuccess<T1, T2>(result);
+				return TESTRESULTS.GenericSuccess(result);
 			}
 		}
 
 
-		public static TESTRESULT<T1, T2> RevitApiCollector<T1, T2>
+		public static TESTRESULT RevitApiCollector
 		(
 			FilteredElementCollector result
 		)
 		{
 			if (result == default)
 			{
-				return TESTRESULTS.GenericFailureCollector<T1, T2>(result);
+				return TESTRESULTS.GenericFailureCollector(result);
 			}
 			else if (result == null)
 			{
-				return TESTRESULTS.GenericFailureCollector<T1, T2>(result);
+				return TESTRESULTS.GenericFailureCollector(result);
 			}
 			else
 			{
-				return TESTRESULTS.GenericSuccessCollector<T1, T2>(result);
+				return TESTRESULTS.GenericSuccessCollector(result);
 			}
 		}
 
 
-		public static TESTRESULT<T1, T2> SimpleValue<T1, T2>
+		public static TESTRESULT SimpleValue
 		(
 			dynamic argument
 		)
@@ -114,31 +114,31 @@ namespace UOP
 
 			if (result == null)
 			{
-				return TESTRESULTS.GenerictFailure<T1, T2>();
+				return TESTRESULTS.GenerictFailure();
 			}
 			else
 			{
-				return TESTRESULTS.GenericSuccess<T1, T2>(result);
+				return TESTRESULTS.GenericSuccess(result);
 			}
 		}
 
-		public static TESTRESULT<T1, T2> SimpleNullableDoubleValue<T1, T2>
+		public static TESTRESULT SimpleNullableDoubleValue
 		(
 			double? result
 		)
 		{
 			if (result == null)
 			{
-				return TESTRESULTS.GenerictFailure<T1, T2>();
+				return TESTRESULTS.GenerictFailure();
 			}
 			else
 			{
-				return TESTRESULTS.GenericSuccess<T1, T2>(result);
+				return TESTRESULTS.GenericSuccess(result);
 			}
 		}
 
 
-		public static TESTRESULT<T1, T2> RevitApiElementResult<T1, T2>
+		public static TESTRESULT RevitApiElement
 		(
 			dynamic argument
 		)
@@ -147,16 +147,16 @@ namespace UOP
 
 			if (result == null)
 			{
-				return TESTRESULTS.GenerictFailure<T1, T2>();
+				return TESTRESULTS.GenerictFailure();
 			}
 			else
 			{
-				return TESTRESULTS.GenericSuccess<T1, T2>(result);
+				return TESTRESULTS.GenericSuccess(result);
 			}
 		}
 
 
-		public static TESTRESULT<T1, T2> ListResult<T1, T2>
+		public static TESTRESULT List
 		(
 			dynamic argument
 		)
@@ -165,11 +165,11 @@ namespace UOP
 
 			if (result == null)
 			{
-				return TESTRESULTS.GenerictFailure<T1, T2>();
+				return TESTRESULTS.GenerictFailure();
 			}
 			else
 			{
-				return TESTRESULTS.GenericSuccessCollection<T1, T2>(result);
+				return TESTRESULTS.GenericSuccessCollection(result);
 			}
 		}
 

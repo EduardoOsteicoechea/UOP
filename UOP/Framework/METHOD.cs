@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace UOP
 {
@@ -20,7 +18,7 @@ namespace UOP
 		public ArgumentsObject MethodArguments { get; set; }
 		public Func<ArgumentsObject, MethodReturnType> MethodAction { get; set; }
 		public METHODSTATE ExecutionResultState { get; set; } = METHODSTATE.NotExecuted;
-		public TESTRESULT<MethodReturnType, ArgumentsObject> TestResult { get; set; }
+		public TESTRESULT TestResult { get; set; }
 
 		[Newtonsoft.Json.JsonIgnore]
 		public string DocumentationFileName { get; set; } = "";
@@ -48,6 +46,7 @@ namespace UOP
 
 		public METHOD
 		(
+			WORKFLOW workflow,
 			DOCUMENTER Documenter,
 			List<RESULT> Results,
 			string methodDescriptiveName,
@@ -58,33 +57,51 @@ namespace UOP
 			Func<ArgumentsObject, MethodReturnType> methodAction,
 			ArgumentsObject methodArguments,
 			bool mustDocumentMethod,
-			Func<MethodReturnType, TESTRESULT<MethodReturnType, ArgumentsObject>> test = null
+			Func<MethodReturnType, TESTRESULT> test = null
 		)
 		{
-			if (!LastMethodFailed)
+			WRAPPER.ManagedCommand(() =>
 			{
-				InstantiateVariables(
-					methodDescriptiveName,
-					intializationTime,
-					methodCounter,
-					documentationFileDirectoryPath,
-					methodAction,
-					methodArguments,
-					mustDocumentMethod
-				);
-
-				RunAndDocumentMethodIfRequired(Documenter, Results, LastMethodFailed, !string.IsNullOrEmpty(methodDescriptiveName));
-
-				if (test != null) 
+				if (!LastMethodFailed)
 				{
-					TestResult = test.Invoke(ResultValue);
+					InstantiateVariables(
+						methodDescriptiveName,
+						intializationTime,
+						methodCounter,
+						documentationFileDirectoryPath,
+						methodAction,
+						methodArguments,
+						mustDocumentMethod
+					);
 
-					TestResult.MethodAction = methodAction;
-					TestResult.MethodArguments = methodArguments;
+					RunAndDocumentMethodIfRequired(Documenter, Results, LastMethodFailed, !string.IsNullOrEmpty(methodDescriptiveName));
 
-					Documenter.Document($"{DocumentationFileName}_TEST", TestResult);
+					if (test != null)
+					{
+						TestResult = test.Invoke(ResultValue);
+
+						LastMethodFailed = !TestResult.PassesTest;
+
+						TestResult.MethodName = MethodName;
+						TestResult.MethodDescriptiveName = methodDescriptiveName;
+						TestResult.ResultValue = ResultValue;
+						TestResult.ResultTypeName = ResultTypeName;
+						TestResult.MethodTime = MethodTime;
+						TestResult.MethodDeclaringTypeName = MethodDeclaringTypeName;
+						TestResult.MethodNamespace = MethodNamespace;
+						TestResult.MethodDeclaringTypeName = MethodTime;
+						TestResult.MethodArguments = methodArguments;
+
+						Documenter.Document($"{DocumentationFileName}_TEST", TestResult);
+
+						if (LastMethodFailed)
+						{
+							ExecutionResultState = METHODSTATE.Failure;
+							new ERRORRESULT(workflow, $"{TestResult.ResultObvervation}\n\nFailed at: {methodDescriptiveName}");
+						}
+					}
 				}
-			}
+			});
 		}
 
 		private void InstantiateVariables

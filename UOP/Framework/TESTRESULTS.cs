@@ -5,50 +5,55 @@ namespace UOP
 	public static class TESTRESULTS
 	{
 
-		public static TESTRESULT<T1, T2> GenerictFailure<T1,T2>()
+		public static TESTRESULT GenerictFailure()
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = false, ResultObvervation = $"Failed to execute action" };
+			return new TESTRESULT() { PassesTest = false, ResultObvervation = $"Failed to complete action" };
 		}
-		public static TESTRESULT<T1, T2> GenericSuccess<T1,T2>(dynamic result)
+		public static TESTRESULT GenericSuccess(dynamic result)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = true, ResultObvervation = $"Successfully executed action (result value: '{result}')" };
+			return new TESTRESULT() { PassesTest = true, ResultObvervation = $"Successfully executed action (result value: '{result}')" };
 		}
 
-		public static TESTRESULT<T1, T2> ExceptionFailure<T1,T2>(System.Exception exception)
+		public static TESTRESULT ExceptionFailure(System.Exception exception)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = false, ResultObvervation = $"{exception.Message}\n\n{exception.StackTrace}" };
+			return new TESTRESULT() { PassesTest = false, ResultObvervation = $"{exception.Message}\n\n{exception.StackTrace}" };
 		}
-		public static TESTRESULT<T1, T2> GenerictFailureSimpleValue<T1,T2>(dynamic result)
+		public static TESTRESULT GenerictFailureSimpleValue(dynamic result)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = false, ResultObvervation = $"Failed to execute action (result value: '{result}')" };
+			return new TESTRESULT() { PassesTest = false, ResultObvervation = $"Failed to complete action (result value: '{result}')" };
 		}
-		public static TESTRESULT<T1, T2> GenerictSuccessSimpleValue<T1,T2>(dynamic result)
+		public static TESTRESULT GenerictSuccessSimpleValue(dynamic result)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = true, ResultObvervation = $"Successfully executed action (result value: '{result}')" };
+			return new TESTRESULT() { PassesTest = true, ResultObvervation = $"Successfully executed action (result value: '{result}')" };
 		}
-		public static TESTRESULT<T1, T2> GenericFailureCollection<T1,T2>(dynamic result)
+		public static TESTRESULT GenericFailureCollection(dynamic result)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = false, ResultObvervation = $"Failed to generated list (result value: '{result}')" };
+			return new TESTRESULT() { PassesTest = false, ResultObvervation = $"Failed to generate list (result value: '{result}')" };
 		}
-		public static TESTRESULT<T1, T2> GenericSuccessCollection<T1,T2>(dynamic result)
+		public static TESTRESULT GenericSuccessCollection(dynamic result)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = true, ResultObvervation = $"Successfully generated list (result value: '{result}'; count: '{result?.Count}')" };
+			return new TESTRESULT() { PassesTest = true, ResultObvervation = $"Successfully generated list (result value: '{result}'; count: '{result?.Count}')" };
 		}
-		public static TESTRESULT<T1, T2> GenericFailureCollector<T1,T2>(dynamic result)
+		public static TESTRESULT GenericFailureCollector(dynamic result)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = false, ResultObvervation = $"Failed to generated collector (result value: '{result}')" };
+			return new TESTRESULT() { PassesTest = false, ResultObvervation = $"Failed to generate collector (result value: '{result}')" };
 		}
-		public static TESTRESULT<T1, T2> GenericSuccessCollector<T1,T2>(Autodesk.Revit.DB.FilteredElementCollector result)
+		public static TESTRESULT GenericSuccessCollector(Autodesk.Revit.DB.FilteredElementCollector result)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = true, ResultObvervation = $"Successfully generated collector (result value: '{result}'; count: '{result.Count()}')" };
+			return new TESTRESULT() { PassesTest = true, ResultObvervation = $"Successfully generated collector (result value: '{result}'; count: '{result.Count()}')" };
 		}
-		public static TESTRESULT<T1, T2> GenericFailureRevitElement<T1,T2>(dynamic result)
+
+		public static TESTRESULT GenericFailureRevitElement(dynamic result)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = false, ResultObvervation = $"Failed to generated list (result value: '{result}')" };
+			return new TESTRESULT() { PassesTest = false, ResultObvervation = $"Failed to generate list (result value: '{result}')" };
 		}
-		public static TESTRESULT<T1, T2> GenericSuccessRevitElement<T1,T2>(dynamic result)
+		public static TESTRESULT GenericSuccessRevitElement(dynamic result)
 		{
-			return new TESTRESULT<T1, T2>() { PassesTest = true, ResultObvervation = $"Successfully generated list (result value: '{result}'; Id: '{result.Id}')" };
+			return new TESTRESULT() { PassesTest = true, ResultObvervation = $"Successfully generated list (result value: '{result}'; Id: '{result.Id}')" };
 		}
+
+
+
+
 	}
 }

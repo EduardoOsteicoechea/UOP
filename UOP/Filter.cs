@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using UOP;
 
 namespace Revit.Actions
 {
@@ -14,30 +12,27 @@ namespace Revit.Actions
 			FilterLevelsByElevationArguments arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<List<Autodesk.Revit.DB.Level>>(() =>
-			{
-				var filteredLevels = new List<Autodesk.Revit.DB.Level>();
+			var filteredLevels = new List<Autodesk.Revit.DB.Level>();
 
-				foreach (var item in arguments.Items)
+			foreach (var item in arguments.Items)
+			{
+				if (arguments.SearchBelowOfElevation)
 				{
-					if (arguments.SearchBelowOfElevation)
+					if (item.Elevation < arguments.FilteringElevation)
 					{
-						if (item.Elevation < arguments.FilteringElevation)
-						{
-							filteredLevels.Add(item);
-						}
-					}
-					else
-					{
-						if (item.Elevation > arguments.FilteringElevation)
-						{
-							filteredLevels.Add(item);
-						}
+						filteredLevels.Add(item);
 					}
 				}
+				else
+				{
+					if (item.Elevation > arguments.FilteringElevation)
+					{
+						filteredLevels.Add(item);
+					}
+				}
+			}
 
-				return filteredLevels;
-			});
+			return filteredLevels;
 		}
 
 		public static List<Autodesk.Revit.DB.Element> ByBuiltInCategory
@@ -45,23 +40,20 @@ namespace Revit.Actions
 			FilterByBuiltInCategoryArguments arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<List<Autodesk.Revit.DB.Element>>(() =>
-			{
-				var result = new List<Autodesk.Revit.DB.Element>();
+			var result = new List<Autodesk.Revit.DB.Element>();
 
-				if (arguments.Category.HasValue)
+			if (arguments.Category.HasValue)
+			{
+				foreach (var item in arguments.Items)
 				{
-					foreach (var item in arguments.Items)
+					if (item.Category != null && item.Category.Id.IntegerValue == (int)arguments.Category.Value)
 					{
-						if (item.Category != null && item.Category.Id.IntegerValue == (int)arguments.Category.Value)
-						{
-							result.Add(item);
-						}
+						result.Add(item);
 					}
 				}
+			}
 
-				return result;
-			});
+			return result;
 		}
 
 		public static double? MaximumOrMinimumByPropertyName<T>
@@ -69,107 +61,100 @@ namespace Revit.Actions
 			FilterMaximumOrMinimumByPropertyNameArguments<T> arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<double?>(() =>
+			var propertyInfo = typeof(T).GetProperty(arguments.PropertyName);
+
+			if (propertyInfo == null)
 			{
-				var propertyInfo = typeof(T).GetProperty(arguments.PropertyName);
+				throw new Exception("The Property is null");
+			}
 
-				if (propertyInfo == null)
+			Type actualPropertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
+
+			if
+			(
+				 actualPropertyType != typeof(double) &&
+				 actualPropertyType != typeof(int) &&
+				 actualPropertyType != typeof(float) &&
+				 actualPropertyType != typeof(decimal) &&
+				 actualPropertyType != typeof(byte) &&
+				 actualPropertyType != typeof(sbyte) &&
+				 actualPropertyType != typeof(short) &&
+				 actualPropertyType != typeof(ushort) &&
+				 actualPropertyType != typeof(uint) &&
+				 actualPropertyType != typeof(long) &&
+				 actualPropertyType != typeof(ulong)
+			)
+			{
+				throw new InvalidOperationException($"Property '{arguments.PropertyName}' on type '{typeof(T).Name}' is not a numeric type.");
+			}
+
+			IEnumerable<double?> numericValues = arguments.Items.Select(item =>
+			{
+				object value = propertyInfo.GetValue(item);
+
+				if (value == null)
 				{
-					throw new Exception("The Property is null");
+					return (double?)null;
 				}
 
-				Type actualPropertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
-
-				if
-				(
-					 actualPropertyType != typeof(double) &&
-					 actualPropertyType != typeof(int) &&
-					 actualPropertyType != typeof(float) &&
-					 actualPropertyType != typeof(decimal) &&
-					 actualPropertyType != typeof(byte) &&
-					 actualPropertyType != typeof(sbyte) &&
-					 actualPropertyType != typeof(short) &&
-					 actualPropertyType != typeof(ushort) &&
-					 actualPropertyType != typeof(uint) &&
-					 actualPropertyType != typeof(long) &&
-					 actualPropertyType != typeof(ulong)
-				)
-				{
-					throw new InvalidOperationException($"Property '{arguments.PropertyName}' on type '{typeof(T).Name}' is not a numeric type.");
-				}
-
-				IEnumerable<double?> numericValues = arguments.Items.Select(item =>
-				{
-					object value = propertyInfo.GetValue(item);
-
-					if (value == null)
-					{
-						return (double?)null;
-					}
-
-					return Math.Round(Convert.ToDouble(value), 2);
-				});
-
-				if (arguments.GetMaximum ?? true)
-				{
-					return numericValues.Max();
-				}
-				else
-				{
-					return numericValues.Min();
-				}
+				return Math.Round(Convert.ToDouble(value), 2);
 			});
-		}
 
+			if (arguments.GetMaximum ?? true)
+			{
+				return numericValues.Max();
+			}
+			else
+			{
+				return numericValues.Min();
+			}
+		}
 
 		public static double? MaximumOrMinimumByPropertyInfo<T>
 		(
 			FilterMaximumOrMinimumByPropertyInfoArguments<T> arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<double?>(() =>
+			Type actualPropertyType = Nullable.GetUnderlyingType(arguments.PropertyInfo.PropertyType) ?? arguments.PropertyInfo.PropertyType;
+
+			if
+			(
+				 actualPropertyType != typeof(double) &&
+				 actualPropertyType != typeof(int) &&
+				 actualPropertyType != typeof(float) &&
+				 actualPropertyType != typeof(decimal) &&
+				 actualPropertyType != typeof(byte) &&
+				 actualPropertyType != typeof(sbyte) &&
+				 actualPropertyType != typeof(short) &&
+				 actualPropertyType != typeof(ushort) &&
+				 actualPropertyType != typeof(uint) &&
+				 actualPropertyType != typeof(long) &&
+				 actualPropertyType != typeof(ulong)
+			)
 			{
-				Type actualPropertyType = Nullable.GetUnderlyingType(arguments.PropertyInfo.PropertyType) ?? arguments.PropertyInfo.PropertyType;
+				throw new InvalidOperationException($"Property '{arguments.PropertyInfo.Name}' on type '{typeof(T).Name}' is not a numeric type.");
+			}
 
-				if
-				(
-					 actualPropertyType != typeof(double) &&
-					 actualPropertyType != typeof(int) &&
-					 actualPropertyType != typeof(float) &&
-					 actualPropertyType != typeof(decimal) &&
-					 actualPropertyType != typeof(byte) &&
-					 actualPropertyType != typeof(sbyte) &&
-					 actualPropertyType != typeof(short) &&
-					 actualPropertyType != typeof(ushort) &&
-					 actualPropertyType != typeof(uint) &&
-					 actualPropertyType != typeof(long) &&
-					 actualPropertyType != typeof(ulong)
-				)
+			IEnumerable<double?> numericValues = arguments.Items.Select(item =>
+			{
+				object value = arguments.PropertyInfo.GetValue(item);
+
+				if (value == null)
 				{
-					throw new InvalidOperationException($"Property '{arguments.PropertyInfo.Name}' on type '{typeof(T).Name}' is not a numeric type.");
+					return (double?)null;
 				}
 
-				IEnumerable<double?> numericValues = arguments.Items.Select(item =>
-				{
-					object value = arguments.PropertyInfo.GetValue(item);
-
-					if (value == null)
-					{
-						return (double?)null;
-					}
-
-					return Math.Round(Convert.ToDouble(value), 2);
-				});
-
-				if (arguments.GetMaximum ?? true)
-				{
-					return numericValues.Max();
-				}
-				else
-				{
-					return numericValues.Min();
-				}
+				return Math.Round(Convert.ToDouble(value), 2);
 			});
+
+			if (arguments.GetMaximum ?? true)
+			{
+				return numericValues.Max();
+			}
+			else
+			{
+				return numericValues.Min();
+			}
 		}
 
 
@@ -178,35 +163,32 @@ namespace Revit.Actions
 			FilterElementsByParameterAndStringValueArguments arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<List<Autodesk.Revit.DB.Element>>(() =>
+			string parameterName = arguments.SourceParameter.Definition.Name;
+
+			var result = new List<Autodesk.Revit.DB.Element>();
+
+			foreach (var item in arguments.Items)
 			{
-				string parameterName = arguments.SourceParameter.Definition.Name;
+				if (item == null) continue;
 
-				var result = new List<Autodesk.Revit.DB.Element>();
-
-				foreach (var item in arguments.Items)
+				try
 				{
-					if (item == null) continue;
+					var castedItem = item as Autodesk.Revit.DB.Element;
 
-					try
+					Autodesk.Revit.DB.Parameter elementParameter = item.LookupParameter(parameterName);
+
+					if (elementParameter != null)
 					{
-						var castedItem = item as Autodesk.Revit.DB.Element;
-
-						Autodesk.Revit.DB.Parameter elementParameter = item.LookupParameter(parameterName);
-
-						if (elementParameter != null)
+						if (elementParameter.AsValueString() == arguments.Value)
 						{
-							if (elementParameter.AsValueString() == arguments.Value)
-							{
-								result.Add(castedItem);
-							}
+							result.Add(castedItem);
 						}
 					}
-					catch { }
 				}
+				catch { }
+			}
 
-				return result;
-			});
+			return result;
 		}
 
 		public static Autodesk.Revit.DB.Element FirstElementByParameterAndStringValue
@@ -214,137 +196,118 @@ namespace Revit.Actions
 			FilterElementsByParameterAndStringValueArguments arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<Autodesk.Revit.DB.Element>(() =>
+			string parameterName = arguments.SourceParameter.Definition.Name;
+
+			var result = new List<Autodesk.Revit.DB.Element>();
+
+			foreach (var item in arguments.Items)
 			{
-				string parameterName = arguments.SourceParameter.Definition.Name;
+				if (item == null) continue;
 
-				var result = new List<Autodesk.Revit.DB.Element>();
-
-				foreach (var item in arguments.Items)
+				try
 				{
-					if (item == null) continue;
+					var castedItem = item as Autodesk.Revit.DB.Element;
 
-					try
+					Autodesk.Revit.DB.Parameter elementParameter = item.LookupParameter(parameterName);
+
+					if (elementParameter != null)
 					{
-						var castedItem = item as Autodesk.Revit.DB.Element;
-
-						Autodesk.Revit.DB.Parameter elementParameter = item.LookupParameter(parameterName);
-
-						if (elementParameter != null)
+						if (elementParameter.AsValueString() == arguments.Value)
 						{
-							if (elementParameter.AsValueString() == arguments.Value)
-							{
-								result.Add(castedItem);
-							}
+							result.Add(castedItem);
 						}
 					}
-					catch { }
 				}
+				catch { }
+			}
 
-				return result.FirstOrDefault();
-			});
+			return result.FirstOrDefault();
 		}
-
 
 		public static List<Autodesk.Revit.DB.Element> ElementsByParameterStringValue<T>
 		(
 			FilterElementsByParameterStringValueArguments arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<List<Autodesk.Revit.DB.Element>>(() =>
+			var result = new List<Autodesk.Revit.DB.Element>();
+
+			foreach (var item in arguments.Items)
 			{
-				var result = new List<Autodesk.Revit.DB.Element>();
-
-				foreach (var item in arguments.Items)
+				try
 				{
-					try
+					var castedItem = item as Autodesk.Revit.DB.Element;
+
+					Autodesk.Revit.DB.Parameter parameter = castedItem.LookupParameter(arguments.ParameterName);
+
+					if (parameter != null)
 					{
-						var castedItem = item as Autodesk.Revit.DB.Element;
-
-						Autodesk.Revit.DB.Parameter parameter = castedItem.LookupParameter(arguments.ParameterName);
-
-						if (parameter != null)
+						if (parameter.AsValueString() == arguments.Value)
 						{
-							if (parameter.AsValueString() == arguments.Value)
-							{
-								result.Add(castedItem);
-							}
+							result.Add(castedItem);
 						}
 					}
-					catch { }
 				}
+				catch { }
+			}
 
-				return result;
-			});
+			return result;
 		}
-
 
 		public static List<Autodesk.Revit.DB.Element> ElementsByParameterStringValueSubstring<T>
 		(
 			FilterElementsByParameterStringValueSubstringArguments arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<List<Autodesk.Revit.DB.Element>>(() =>
+			var result = new List<Autodesk.Revit.DB.Element>();
+
+			foreach (var item in arguments.Items)
 			{
-				var result = new List<Autodesk.Revit.DB.Element>();
-
-				foreach (var item in arguments.Items)
+				try
 				{
-					try
+					var castedItem = item as Autodesk.Revit.DB.Element;
+
+					Autodesk.Revit.DB.Parameter parameter = castedItem.LookupParameter(arguments.ParameterName);
+
+					if (parameter != null)
 					{
-						var castedItem = item as Autodesk.Revit.DB.Element;
-
-						Autodesk.Revit.DB.Parameter parameter = castedItem.LookupParameter(arguments.ParameterName);
-
-						if (parameter != null)
+						if (parameter.AsValueString().Contains(arguments.Value))
 						{
-							if (parameter.AsValueString().Contains(arguments.Value))
-							{
-								result.Add(castedItem);
-							}
+							result.Add(castedItem);
 						}
 					}
-					catch { }
 				}
+				catch { }
+			}
 
-				return result;
-			});
+			return result;
 		}
-
 
 		public static List<Autodesk.Revit.DB.Element> ByNameSubstring
 		(
 			FilterByNameSubstringArguments arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<List<Autodesk.Revit.DB.Element>>(() =>
+			var result = new List<Autodesk.Revit.DB.Element>();
+
+			foreach (var item in arguments.Items)
 			{
-				var result = new List<Autodesk.Revit.DB.Element>();
-
-				foreach (var item in arguments.Items)
+				if (item.Name.Contains(arguments.Substring))
 				{
-					if (item.Name.Contains(arguments.Substring))
-					{
-						result.Add(item);
-					}
+					result.Add(item);
 				}
+			}
 
-				return result;
-			});
+			return result;
 		}
-
 
 		public static FilteredElementCollector ByFilter
 		(
 			FilterByFilterArguments arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<Autodesk.Revit.DB.FilteredElementCollector>(() =>
-			{
-				return new FilteredElementCollector(arguments.Document)
-				.WhereElementIsNotElementType()
-				.WherePasses(arguments.Filter);
-			});
+			return new FilteredElementCollector(arguments.Document)
+			.WhereElementIsNotElementType()
+			.WherePasses(arguments.Filter);
 		}
 
 
@@ -353,12 +316,9 @@ namespace Revit.Actions
 			dynamic[] arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<List<T>>(() =>
-			{
-				var items = arguments[0] as List<Autodesk.Revit.DB.Element>;
+			var items = arguments[0] as List<Autodesk.Revit.DB.Element>;
 
-				return items.OfType<T>().ToList();
-			});
+			return items.OfType<T>().ToList();
 		}
 
 		public static List<T> ByLevel<T>
@@ -366,31 +326,28 @@ namespace Revit.Actions
 			dynamic[] arguments
 		)
 		{
-			return WRAPPER.ManagedCommand<List<T>>(() =>
+			var levels = arguments[0] as List<Autodesk.Revit.DB.Level>;
+			var items = arguments[1] as List<T>;
+
+			var result = new List<T>();
+
+			foreach (var level in levels)
 			{
-				var levels = arguments[0] as List<Autodesk.Revit.DB.Level>;
-				var items = arguments[1] as List<T>;
-
-				var result = new List<T>();
-
-				foreach (var level in levels)
+				foreach (var item in items)
 				{
-					foreach (var item in items)
+					if (item != null)
 					{
-						if (item != null)
-						{
-							var castedElement = item as Autodesk.Revit.DB.Element;
+						var castedElement = item as Autodesk.Revit.DB.Element;
 
-							if (castedElement.LevelId == level.Id)
-							{
-								result.Add(item);
-							}
+						if (castedElement.LevelId == level.Id)
+						{
+							result.Add(item);
 						}
 					}
 				}
+			}
 
-				return result;
-			});
+			return result;
 		}
 	}
 }

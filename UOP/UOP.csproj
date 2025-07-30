@@ -66,11 +66,18 @@
   <ItemGroup>
     <Compile Include="BoundingBoxIntersectsFilterArguments.cs" />
     <Compile Include="BoundingBoxIntersectsFilter.cs" />
+    <Compile Include="CastArguments.cs" />
     <Compile Include="Cast.cs" />
+    <Compile Include="CollectArguments.cs" />
     <Compile Include="Collection.cs" />
     <Compile Include="CollectionArguments.cs" />
+    <Compile Include="Framework\METHOD - Copy.cs" />
+    <Compile Include="Framework\SUCCESSRESULT.cs" />
+    <Compile Include="Framework\ERRORRESULT.cs" />
     <Compile Include="Framework\TESTRESULT.cs" />
+    <Compile Include="Framework\TESTRESULTS - Copy.cs" />
     <Compile Include="Framework\TESTRESULTS.cs" />
+    <Compile Include="Framework\TESTS - Copy.cs" />
     <Compile Include="Framework\TESTS.cs" />
     <Compile Include="IntersectArguments.cs" />
     <Compile Include="FilterArguments.cs" />

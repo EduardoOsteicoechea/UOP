@@ -10,11 +10,6 @@ namespace UOP
 {
 	internal class Collection
 	{
-		
-
-
-
-
 		public static bool? AreAllValuesNotNull<T>
 		(
 			CollectionAreAllValuesNotNullArguments<T> arguments

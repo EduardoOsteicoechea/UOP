@@ -21,7 +21,7 @@ namespace UOP
 		private bool MustDocument { get; set; } = true;
 		private int ActionCounter { get; set; } = 0;
 		public List<RESULT> Results { get; set; } = new List<RESULT>();
-		public bool PreviousMethodFailed { get; set; }
+		public bool LastMethodFailed { get; set; }
 		private DOCUMENTER Documenter { get; set; }
 
 		public WORKFLOW
@@ -53,21 +53,22 @@ namespace UOP
 			Func<ArgumentsObject, MethodReturnType> action,
 			ArgumentsObject actionArguments,
 			string methodDescriptiveName = "",
-			Func<MethodReturnType, TESTRESULT<MethodReturnType, ArgumentsObject>> test = null
+			Func<MethodReturnType, TESTRESULT> test = null
 		)
 		{
 			return WRAPPER.ManagedCommand<MethodReturnType>(() =>
 			{
 				MethodReturnType result = default;
 
-				if (!PreviousMethodFailed)
+				if (!LastMethodFailed)
 				{
 					var uopMethod = new METHOD<MethodReturnType, ArgumentsObject>
 					(
+						this,
 						Documenter,
 						Results,
 						methodDescriptiveName,
-						PreviousMethodFailed,
+						LastMethodFailed,
 						InitializationTime,
 						ActionCounter,
 						DocumentationTimedDirectoryPath,
@@ -126,7 +127,7 @@ namespace UOP
 					{
 						Documenter.Document(
 							$"___{uopMethod.DocumentationFileName}_{"ERRORS"}",
-							uopMethod.ResultValue
+							uopMethod
 						);
 					}
 				}
@@ -142,7 +143,7 @@ namespace UOP
 			{
 				if (uopMethod.ExecutionResultState == METHODSTATE.Failure)
 				{
-					PreviousMethodFailed = true;
+					LastMethodFailed = true;
 				}
 			});
 		}

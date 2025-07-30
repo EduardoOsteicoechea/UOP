@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UOP
 {
 	public class WORKFLOW
 	{
-		private string InitializationTime { get; set; } = DateTime.Now.ToString("yyyyMMdd_HHmm");
+		private string InitializationTime { get; set; } = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 		private string DocumentationDirectoryPath { get; set; } = System.IO.Path.Combine(
 			Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
 			"UOP",
@@ -83,6 +80,8 @@ namespace UOP
 					DocumentExceptionIfAny<MethodReturnType, ArgumentsObject>(uopMethod);
 
 					ValidateIfMethodFailed<MethodReturnType, ArgumentsObject>(uopMethod);
+
+					result = uopMethod.ResultValue;
 
 					return result;
 				}

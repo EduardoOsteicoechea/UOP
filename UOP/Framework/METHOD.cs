@@ -71,7 +71,7 @@ namespace UOP
 					mustDocumentMethod
 				);
 
-				RunAndDocumentMethodIfRequired(Documenter, Results, LastMethodFailed, true);
+				RunAndDocumentMethodIfRequired(Documenter, Results, LastMethodFailed, !string.IsNullOrEmpty(methodDescriptiveName));
 			}
 		}
 

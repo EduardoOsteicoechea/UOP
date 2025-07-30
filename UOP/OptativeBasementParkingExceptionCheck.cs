@@ -26,13 +26,15 @@ namespace Revit.Actions
 			var referencePlanesCollector = uop.Run<FilteredElementCollector, CollectInstancesByTypeArguments>(
 				Collect.InstancesByType<ReferencePlane>,
 				new CollectInstancesByTypeArguments(document)
-				//,"CollectReferencePlanes"
+				,"CollectReferencePlanes"
+				,TESTS.RevitApiCollector<Autodesk.Revit.DB.FilteredElementCollector, CollectInstancesByTypeArguments>
 			);
 
-			var referencePlanes = uop.Run<List<Element>, CastCollectorItemsToListArguments>(
+			var referencePlanes = uop.Run<List<Autodesk.Revit.DB.Element>, CastCollectorItemsToListArguments>(
 				Cast.CollectorItemsToList<Element>,
 				new CastCollectorItemsToListArguments(referencePlanesCollector)
-				//,"CastElementsListFromCollector"
+				,"CastElementsListFromCollector"
+				,TESTS.CastCollectorItemsToList<List<Autodesk.Revit.DB.Element>, CastCollectorItemsToListArguments>
 			);
 
 			//var nameParameter = uop.Run<Autodesk.Revit.DB.Parameter, ParameterGetByRevitUINameAndCategoryArguments>(

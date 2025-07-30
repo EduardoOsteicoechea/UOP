@@ -69,6 +69,9 @@
     <Compile Include="Cast.cs" />
     <Compile Include="Collection.cs" />
     <Compile Include="CollectionArguments.cs" />
+    <Compile Include="Framework\TESTRESULT.cs" />
+    <Compile Include="Framework\TESTRESULTS.cs" />
+    <Compile Include="Framework\TESTS.cs" />
     <Compile Include="IntersectArguments.cs" />
     <Compile Include="FilterArguments.cs" />
     <Compile Include="Filter.cs" />

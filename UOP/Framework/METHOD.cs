@@ -20,6 +20,7 @@ namespace UOP
 		public ArgumentsObject MethodArguments { get; set; }
 		public Func<ArgumentsObject, MethodReturnType> MethodAction { get; set; }
 		public METHODSTATE ExecutionResultState { get; set; } = METHODSTATE.NotExecuted;
+		public TESTRESULT<MethodReturnType, ArgumentsObject> TestResult { get; set; }
 
 		[Newtonsoft.Json.JsonIgnore]
 		public string DocumentationFileName { get; set; } = "";
@@ -56,7 +57,8 @@ namespace UOP
 			string documentationFileDirectoryPath,
 			Func<ArgumentsObject, MethodReturnType> methodAction,
 			ArgumentsObject methodArguments,
-			bool mustDocumentMethod
+			bool mustDocumentMethod,
+			Func<MethodReturnType, TESTRESULT<MethodReturnType, ArgumentsObject>> test = null
 		)
 		{
 			if (!LastMethodFailed)
@@ -72,6 +74,16 @@ namespace UOP
 				);
 
 				RunAndDocumentMethodIfRequired(Documenter, Results, LastMethodFailed, !string.IsNullOrEmpty(methodDescriptiveName));
+
+				if (test != null) 
+				{
+					TestResult = test.Invoke(ResultValue);
+
+					TestResult.MethodAction = methodAction;
+					TestResult.MethodArguments = methodArguments;
+
+					Documenter.Document($"{DocumentationFileName}_TEST", TestResult);
+				}
 			}
 		}
 

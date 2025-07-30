@@ -52,7 +52,8 @@ namespace UOP
 		(
 			Func<ArgumentsObject, MethodReturnType> action,
 			ArgumentsObject actionArguments,
-			string methodDescriptiveName = ""
+			string methodDescriptiveName = "",
+			Func<MethodReturnType, TESTRESULT<MethodReturnType, ArgumentsObject>> test = null
 		)
 		{
 			return WRAPPER.ManagedCommand<MethodReturnType>(() =>
@@ -72,7 +73,8 @@ namespace UOP
 						DocumentationTimedDirectoryPath,
 						action,
 						actionArguments,
-						MustDocument
+						MustDocument,
+						test
 					);
 
 					ActionCounter++;

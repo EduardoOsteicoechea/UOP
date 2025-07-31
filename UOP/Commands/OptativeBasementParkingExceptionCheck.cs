@@ -46,7 +46,7 @@ namespace Revit.Actions
 
 			if (nameParameter == null && !uop.LastMethodFailed)
 			{
-				new ERRORRESULT(uop, "Error al obtener el parámetro 'Name' de los planos de Referencia");
+				new REVITERRORRESULT(uop, "Error al obtener el parámetro 'Name' de los planos de Referencia");
 				return;
 			}
 
@@ -115,7 +115,7 @@ namespace Revit.Actions
 
 			if (revitModelHasBasements == false && !uop.LastMethodFailed)
 			{
-				new SUCCESSRESULT(uop, "No hay subsuelos que validar.");
+				new REVITSUCCESSRESULT(uop, "No hay subsuelos que validar.");
 				uop.DocumentResults();
 				return;
 			}
@@ -143,7 +143,7 @@ namespace Revit.Actions
 
 			if (modelHasRooms == false && !uop.LastMethodFailed)
 			{
-				new ERRORRESULT(uop, "El modelo no tiene instancias de 'Rooms'.");
+				new REVITERRORRESULT(uop, "El modelo no tiene instancias de 'Rooms'.");
 				uop.DocumentResults();
 				return;
 			}
@@ -157,7 +157,7 @@ namespace Revit.Actions
 
 			if (parkingIdentifyerParameter == null && !uop.LastMethodFailed)
 			{
-				new ERRORRESULT(uop, "Error obteniendo el parámetro 'Get_MC_Tipo de Local/Área Descubierta_Parameter'.");
+				new REVITERRORRESULT(uop, "Error obteniendo el parámetro 'Get_MC_Tipo de Local/Área Descubierta_Parameter'.");
 				uop.DocumentResults();
 				return;
 			}
@@ -196,7 +196,7 @@ namespace Revit.Actions
 				!uop.LastMethodFailed
 			)
 			{
-				new SUCCESSRESULT(uop, "No hay instancias de 'Room' que validar");
+				new REVITSUCCESSRESULT(uop, "No hay instancias de 'Room' que validar");
 				uop.DocumentResults();
 				return;
 			}
@@ -232,7 +232,7 @@ namespace Revit.Actions
 
 			if (!uop.LastMethodFailed)
 			{
-				new SUCCESSRESULT(uop, "Flujo de trabajo completado.");
+				new REVITSUCCESSRESULT(uop, "Flujo de trabajo completado.");
 				uop.DocumentResults();
 			}
 		}

@@ -72,13 +72,10 @@
     <Compile Include="Collection.cs" />
     <Compile Include="CollectionArguments.cs" />
     <Compile Include="Commands\OptativeBasementParkingExceptionCheck - ExplicitTests.cs" />
-    <Compile Include="Framework\METHOD - ExplicitTests.cs" />
-    <Compile Include="Framework\SUCCESSRESULT.cs" />
-    <Compile Include="Framework\ERRORRESULT.cs" />
+    <Compile Include="Framework\REVITSUCCESSRESULT.cs" />
+    <Compile Include="Framework\REVITERRORRESULT.cs" />
     <Compile Include="Framework\TESTRESULT.cs" />
-    <Compile Include="Framework\TESTRESULTS.cs" />
     <Compile Include="Framework\TESTS.cs" />
-    <Compile Include="Framework\WORKFLOW - ExplicitTest.cs" />
     <Compile Include="IntersectArguments.cs" />
     <Compile Include="FilterArguments.cs" />
     <Compile Include="Filter.cs" />

@@ -78,11 +78,11 @@ namespace UOP
 						mustDocument
 					);
 
-					RunMethod(Documenter, Results/* ,LastMethodFailed*/);
+					RunMethod(Documenter, Results);
 
 					DocumentMethod(Documenter, !string.IsNullOrEmpty(methodDescriptiveName));
 
-					TestMethod(Workflow, Documenter /*, LastMethodFailed*/);
+					TestMethod(Workflow, Documenter);
 				}
 			});
 		}
@@ -128,7 +128,6 @@ namespace UOP
 		(
 			DOCUMENTER Documenter,
 			List<RESULT> Results,
-			//bool MethodFailed,
 			bool mustDocumentPurposeNamedFile = true
 		)
 		{
@@ -145,8 +144,6 @@ namespace UOP
 				catch (Exception e)
 				{
 					ExecutionResultState = METHODSTATE.Failure;
-
-					//MethodFailed = true;
 
 					UpdateResultsCollector(Results, MethodCounter, MethodDescriptiveName, $"{e.Message}\n\n{e.StackTrace}");
 				}
@@ -202,7 +199,6 @@ namespace UOP
 		(
 			WORKFLOW workflow,
 			DOCUMENTER Documenter
-		//,bool LastMethodFailed
 		)
 		{
 			WRAPPER.ManagedCommand(() =>
@@ -210,8 +206,6 @@ namespace UOP
 				if (MustTest)
 				{
 					TestResult = TESTS.NonNull(ResultValue);
-
-					//LastMethodFailed = !TestResult.PassesTest;
 
 					TestResult.MethodName = MethodName;
 					TestResult.MethodDescriptiveName = MethodDescriptiveName;
@@ -225,12 +219,11 @@ namespace UOP
 
 					Documenter.Document($"{DocumentationFileName}_TEST", TestResult);
 
-					//if (LastMethodFailed)
 					if (!TestResult.PassesTest)
 					{
 						ExecutionResultState = METHODSTATE.Failure;
 
-						new ERRORRESULT(workflow, $"{TestResult.ResultObvervation}\n\nFailed at: {MethodDescriptiveName}");
+						new REVITERRORRESULT(workflow, $"{TestResult.ResultObvervation}\n\nFailed at: {MethodDescriptiveName}");
 					}
 				}
 			});

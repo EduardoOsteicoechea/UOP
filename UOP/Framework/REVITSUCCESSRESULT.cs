@@ -1,15 +1,10 @@
 ﻿using Autodesk.Revit.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UOP
 {
-	internal class SUCCESSRESULT
+	internal class REVITSUCCESSRESULT
 	{
-		public SUCCESSRESULT(WORKFLOW uop, string message) 
+		public REVITSUCCESSRESULT(WORKFLOW uop, string message) 
 		{
 			WRAPPER.ManagedCommand(() => {
 				var td = new TaskDialog("Success");

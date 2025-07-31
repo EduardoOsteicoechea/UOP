@@ -219,7 +219,7 @@ namespace UOP.Core
 					TestResult.MethodDeclaringTypeName = MethodTime;
 					TestResult.MethodArguments = MethodArguments;
 
-					Documenter.Document($"{DocumentationFileName}_TEST", TestResult);
+					Documenter.DocumentTest($"{DocumentationFileName}", TestResult);
 
 					if (!TestResult.PassesTest)
 					{

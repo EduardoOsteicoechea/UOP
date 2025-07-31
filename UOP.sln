@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UOP.Revit.Commands.Revit202
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UOP.Common.Documenter", "UOP.Common.Documenter\UOP.Common.Documenter.csproj", "{915C2142-E609-4BE2-8116-D406052547A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UOP.Common.Locations", "UOP.Common.Locations\UOP.Common.Locations.csproj", "{DC95B112-28C6-431B-B4D3-BCD3568898FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UOP.Agent", "UOP.Agent\UOP.Agent.csproj", "{0B6936D3-48BE-4358-ABAE-93D5ED2F5379}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{915C2142-E609-4BE2-8116-D406052547A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{915C2142-E609-4BE2-8116-D406052547A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{915C2142-E609-4BE2-8116-D406052547A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC95B112-28C6-431B-B4D3-BCD3568898FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC95B112-28C6-431B-B4D3-BCD3568898FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC95B112-28C6-431B-B4D3-BCD3568898FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC95B112-28C6-431B-B4D3-BCD3568898FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B6936D3-48BE-4358-ABAE-93D5ED2F5379}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B6936D3-48BE-4358-ABAE-93D5ED2F5379}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B6936D3-48BE-4358-ABAE-93D5ED2F5379}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B6936D3-48BE-4358-ABAE-93D5ED2F5379}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

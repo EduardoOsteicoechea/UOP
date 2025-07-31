@@ -2,14 +2,14 @@
 
 namespace UOP.Common.Documenter
 {
-	public class DOCUMENTER
+	public class WPFDOCUMENTER
 	{
 		private string DocumentationDirectoryPath { get; set; }
 		private string DocumentationDirectoryTestsDirectoryPath { get; set; }
 		private string DocumentationDirectoryChatHistoryDirectoryPath { get; set; }
 		public Newtonsoft.Json.JsonSerializerSettings SerializerSettings { get; set; }
 
-		public DOCUMENTER
+		public WPFDOCUMENTER
 		(
 			string documentationDirectoryPath,
 			string documentationDirectoryTestsDirectoryPath,
@@ -23,7 +23,6 @@ namespace UOP.Common.Documenter
 			SerializerSettings = new Newtonsoft.Json.JsonSerializerSettings
 			{
 				Converters = {
-						new RevitObjectConverter(),
 						new DelegateConverter(),
 						new Newtonsoft.Json.Converters.StringEnumConverter(),
 					},

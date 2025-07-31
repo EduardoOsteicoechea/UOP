@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using UOP.Common.Locations;
 
 namespace UOP.Core
 {
@@ -45,9 +46,7 @@ namespace UOP.Core
 		public static void HandleError(System.Exception e)
 		{
 			var filePath = System.IO.Path.Combine(
-				Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-				"UOP",
-				"FrameworkErrors",
+				Locations.FrameworkErrorsDirectoryPath,
 				$"{DateTime.Now.ToString("yyyyMMdd_HHmm")}.txt"
 			);
 

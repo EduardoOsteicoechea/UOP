@@ -2,23 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using UOP.Common.Documenter;
+using UOP.Common.Locations;
 
 namespace UOP.Core
 {
 	public class WORKFLOW
 	{
 		private string InitializationTime { get; set; } = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-		private string DocumentationDirectoryPath { get; set; } = System.IO.Path.Combine(
-			Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-			"UOP",
-			"Executions"
-		);
-		private string FrameworkErrorsDirectoryPath { get; set; } = System.IO.Path.Combine(
-			Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-			"UOP",
-			"FrameworkErrors"
-		);
+		private string DocumentationDirectoryPath { get; set; } = Locations.DocumentationDirectoryPath;
+		private string FrameworkErrorsDirectoryPath { get; set; } = Locations.FrameworkErrorsDirectoryPath;
 		private string DocumentationTimedDirectoryPath { get; set; }
+		private string DocumentationTimedDirectoryTestsDirectoryPathPath { get; set; }
+		private string DocumentationTimedDirectoryChatHistoryDirectoryPathPath { get; set; }
 		private bool MustDocument { get; set; } = true;
 		private bool MustTest { get; set; } = true;
 		private int ActionCounter { get; set; } = 1;
@@ -44,8 +39,16 @@ namespace UOP.Core
 				MustTest = mustTest;
 
 				DocumentationTimedDirectoryPath = Path.Combine(DocumentationDirectoryPath, InitializationTime);
+				DocumentationTimedDirectoryTestsDirectoryPathPath = Path.Combine(DocumentationTimedDirectoryPath, "TESTS");
+				DocumentationTimedDirectoryChatHistoryDirectoryPathPath = Path.Combine(DocumentationDirectoryPath, InitializationTime, "CHAT");
+
 				CreateRequiredDirectories();
-				Documenter = new DOCUMENTER(DocumentationTimedDirectoryPath);
+
+				Documenter = new DOCUMENTER(
+					DocumentationTimedDirectoryPath, 
+					DocumentationTimedDirectoryTestsDirectoryPathPath, 
+					DocumentationTimedDirectoryChatHistoryDirectoryPathPath
+				);
 			});
 		}
 
@@ -95,6 +98,7 @@ namespace UOP.Core
 			{
 				CreateDirectoryIfPossible(DocumentationDirectoryPath);
 				CreateDirectoryIfPossible(DocumentationTimedDirectoryPath);
+				CreateDirectoryIfPossible(DocumentationTimedDirectoryTestsDirectoryPathPath);
 				CreateDirectoryIfPossible(FrameworkErrorsDirectoryPath);
 			});
 		}

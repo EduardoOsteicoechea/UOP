@@ -19,7 +19,8 @@ namespace UOP
 		);
 		private string DocumentationTimedDirectoryPath { get; set; }
 		private bool MustDocument { get; set; } = true;
-		private int ActionCounter { get; set; } = 0;
+		private bool MustTest { get; set; } = true;
+		private int ActionCounter { get; set; } = 1;
 		public List<RESULT> Results { get; set; } = new List<RESULT>();
 		public bool LastMethodFailed { get; set; }
 		private DOCUMENTER Documenter { get; set; }
@@ -27,7 +28,8 @@ namespace UOP
 		public WORKFLOW
 		(
 			string documentationDirectoryPath = "",
-			bool mustDocument = true
+			bool mustDocument = true,
+			bool mustTest = true
 		)
 		{
 			WRAPPER.ManagedCommand(() =>
@@ -37,10 +39,8 @@ namespace UOP
 					DocumentationDirectoryPath = documentationDirectoryPath;
 				}
 
-				if (!mustDocument)
-				{
-					MustDocument = false;
-				}
+				MustDocument = mustDocument;
+				MustTest = mustTest;
 
 				DocumentationTimedDirectoryPath = Path.Combine(DocumentationDirectoryPath, InitializationTime);
 				CreateRequiredDirectories();
@@ -52,14 +52,11 @@ namespace UOP
 		(
 			Func<ArgumentsObject, MethodReturnType> action,
 			ArgumentsObject actionArguments,
-			string methodDescriptiveName = "",
-			Func<MethodReturnType, TESTRESULT> test = null
+			string methodDescriptiveName = ""
 		)
 		{
 			return WRAPPER.ManagedCommand<MethodReturnType>(() =>
 			{
-				MethodReturnType result = default;
-
 				if (!LastMethodFailed)
 				{
 					var uopMethod = new METHOD<MethodReturnType, ArgumentsObject>
@@ -75,7 +72,7 @@ namespace UOP
 						action,
 						actionArguments,
 						MustDocument,
-						test
+						MustTest
 					);
 
 					ActionCounter++;
@@ -84,12 +81,10 @@ namespace UOP
 
 					ValidateIfMethodFailed<MethodReturnType, ArgumentsObject>(uopMethod);
 
-					result = uopMethod.ResultValue;
-
-					return result;
+					return uopMethod.ResultValue;
 				}
 
-				return result;
+				return default;
 			});
 		}
 
@@ -126,7 +121,7 @@ namespace UOP
 					if (uopMethod.ExecutionResultState == METHODSTATE.Failure)
 					{
 						Documenter.Document(
-							$"___{uopMethod.DocumentationFileName}_{"ERRORS"}",
+							$"____ERROR_{uopMethod.DocumentationFileName}",
 							uopMethod
 						);
 					}

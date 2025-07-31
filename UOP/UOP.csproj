@@ -71,11 +71,14 @@
     <Compile Include="CollectArguments.cs" />
     <Compile Include="Collection.cs" />
     <Compile Include="CollectionArguments.cs" />
+    <Compile Include="Commands\OptativeBasementParkingExceptionCheck - ExplicitTests.cs" />
+    <Compile Include="Framework\METHOD - ExplicitTests.cs" />
     <Compile Include="Framework\SUCCESSRESULT.cs" />
     <Compile Include="Framework\ERRORRESULT.cs" />
     <Compile Include="Framework\TESTRESULT.cs" />
     <Compile Include="Framework\TESTRESULTS.cs" />
     <Compile Include="Framework\TESTS.cs" />
+    <Compile Include="Framework\WORKFLOW - ExplicitTest.cs" />
     <Compile Include="IntersectArguments.cs" />
     <Compile Include="FilterArguments.cs" />
     <Compile Include="Filter.cs" />
@@ -86,7 +89,7 @@
     <Compile Include="Framework\DOCUMENTER.cs" />
     <Compile Include="Framework\METHOD.cs" />
     <Compile Include="Framework\METHODSTATE.cs" />
-    <Compile Include="OptativeBasementParkingExceptionCheck.cs" />
+    <Compile Include="Commands\OptativeBasementParkingExceptionCheck.cs" />
     <Compile Include="Framework\RESULT.cs" />
     <Compile Include="Framework\CONVERTERS.cs" />
     <Compile Include="Framework\WORKFLOW.cs" />

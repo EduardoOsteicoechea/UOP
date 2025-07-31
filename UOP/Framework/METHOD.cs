@@ -11,7 +11,7 @@ namespace UOP
 		public string MethodTime { get; set; }
 		public string MethodName { get; set; } = "";
 		public string MethodDeclaringTypeName { get; set; } = "";
-		public string MethodPurposeOnAlgorithmFileName { get; set; } = "";
+		public string MethodDescriptiveName { get; set; } = "";
 		public string MethodNamespace { get; set; } = "";
 		public MethodReturnType ResultValue { get; set; } = default;
 		public string ResultTypeName { get; set; } = default;
@@ -35,7 +35,10 @@ namespace UOP
 		public StringBuilder MethodDocumentationStringBuilder { get; set; } = new StringBuilder();
 
 		[Newtonsoft.Json.JsonIgnore]
-		public bool MustDocumentMethod { get; set; } = true;
+		public bool MustDocument { get; set; } = true;
+
+		[Newtonsoft.Json.JsonIgnore]
+		public bool MustTest { get; set; } = true;
 
 		[Newtonsoft.Json.JsonIgnore]
 		public Newtonsoft.Json.JsonSerializerSettings SerializerSettings { get; set; }
@@ -46,7 +49,7 @@ namespace UOP
 
 		public METHOD
 		(
-			WORKFLOW workflow,
+			WORKFLOW Workflow,
 			DOCUMENTER Documenter,
 			List<RESULT> Results,
 			string methodDescriptiveName,
@@ -56,8 +59,8 @@ namespace UOP
 			string documentationFileDirectoryPath,
 			Func<ArgumentsObject, MethodReturnType> methodAction,
 			ArgumentsObject methodArguments,
-			bool mustDocumentMethod,
-			Func<MethodReturnType, TESTRESULT> test = null
+			bool mustDocument,
+			bool mustTest
 		)
 		{
 			WRAPPER.ManagedCommand(() =>
@@ -71,35 +74,15 @@ namespace UOP
 						documentationFileDirectoryPath,
 						methodAction,
 						methodArguments,
-						mustDocumentMethod
+						mustDocument,
+						mustDocument
 					);
 
-					RunAndDocumentMethodIfRequired(Documenter, Results, LastMethodFailed, !string.IsNullOrEmpty(methodDescriptiveName));
+					RunMethod(Documenter, Results/* ,LastMethodFailed*/);
 
-					if (test != null)
-					{
-						TestResult = test.Invoke(ResultValue);
+					DocumentMethod(Documenter, !string.IsNullOrEmpty(methodDescriptiveName));
 
-						LastMethodFailed = !TestResult.PassesTest;
-
-						TestResult.MethodName = MethodName;
-						TestResult.MethodDescriptiveName = methodDescriptiveName;
-						TestResult.ResultValue = ResultValue;
-						TestResult.ResultTypeName = ResultTypeName;
-						TestResult.MethodTime = MethodTime;
-						TestResult.MethodDeclaringTypeName = MethodDeclaringTypeName;
-						TestResult.MethodNamespace = MethodNamespace;
-						TestResult.MethodDeclaringTypeName = MethodTime;
-						TestResult.MethodArguments = methodArguments;
-
-						Documenter.Document($"{DocumentationFileName}_TEST", TestResult);
-
-						if (LastMethodFailed)
-						{
-							ExecutionResultState = METHODSTATE.Failure;
-							new ERRORRESULT(workflow, $"{TestResult.ResultObvervation}\n\nFailed at: {methodDescriptiveName}");
-						}
-					}
+					TestMethod(Workflow, Documenter /*, LastMethodFailed*/);
 				}
 			});
 		}
@@ -112,7 +95,8 @@ namespace UOP
 			string documentationFileDirectoryPath,
 			Func<ArgumentsObject, MethodReturnType> methodAction,
 			ArgumentsObject methodArguments,
-			bool mustDocumentMethod
+			bool mustDocumentMethod,
+			bool mustTest
 		)
 		{
 			WRAPPER.ManagedCommand(() =>
@@ -132,52 +116,55 @@ namespace UOP
 				DocumentationFileDirectoryPath = documentationFileDirectoryPath;
 				DocumentationFileTimedDirectoryPath = Path.Combine(DocumentationFileDirectoryPath, MethodTime);
 				DocumentationFileName = $"{fileNamesBase}{MethodName}";
-				MethodPurposeOnAlgorithmFileName = $"{fileNamesBase}{methodDescriptiveName}";
+				MethodDescriptiveName = $"{fileNamesBase}{methodDescriptiveName}";
 
-				MustDocumentMethod = mustDocumentMethod;
+				MustDocument = mustDocumentMethod;
+				MustTest = mustTest;
 			});
 		}
 
 
-		private void RunAndDocumentMethodIfRequired
+		private void RunMethod
 		(
 			DOCUMENTER Documenter,
 			List<RESULT> Results,
-			bool MethodFailed,
+			//bool MethodFailed,
 			bool mustDocumentPurposeNamedFile = true
 		)
 		{
-			try
+			WRAPPER.ManagedCommand(() =>
 			{
-				ResultValue = MethodAction.Invoke(MethodArguments);
-
-				ExecutionResultState = METHODSTATE.Success;
-
-				Results.Add(new RESULT()
+				try
 				{
-					ActionNumber = MethodCounter,
-					ActionDescription = MethodPurposeOnAlgorithmFileName,
-					Value = ResultValue,
-				});
-			}
-			catch (Exception e)
-			{
-				ExecutionResultState = METHODSTATE.Failure;
+					ResultValue = MethodAction.Invoke(MethodArguments);
 
-				MethodFailed = true;
+					ExecutionResultState = METHODSTATE.Success;
 
-				Results.Add(new RESULT()
+					UpdateResultsCollector(Results, MethodCounter, MethodDescriptiveName, ResultValue);
+				}
+				catch (Exception e)
 				{
-					ActionNumber = MethodCounter,
-					ActionDescription = MethodPurposeOnAlgorithmFileName,
-					Value = $"{e.Message}\n\n{e.StackTrace}",
-				});
-			}
-			finally
+					ExecutionResultState = METHODSTATE.Failure;
+
+					//MethodFailed = true;
+
+					UpdateResultsCollector(Results, MethodCounter, MethodDescriptiveName, $"{e.Message}\n\n{e.StackTrace}");
+				}
+			});
+		}
+
+
+		private void DocumentMethod
+		(
+			DOCUMENTER Documenter,
+			bool mustDocumentPurposeNamedFile = true
+		)
+		{
+			WRAPPER.ManagedCommand(() =>
 			{
 				if
 				(
-					MustDocumentMethod &&
+					MustDocument &&
 					!string.IsNullOrEmpty(DocumentationFileDirectoryPath) &&
 					!string.IsNullOrEmpty(DocumentationFileName)
 				)
@@ -186,10 +173,67 @@ namespace UOP
 
 					if (mustDocumentPurposeNamedFile)
 					{
-						Documenter.Document($"__{MethodPurposeOnAlgorithmFileName}", this);
+						Documenter.Document($"__{MethodDescriptiveName}", this);
 					}
 				}
-			}
+			});
+		}
+
+		private void UpdateResultsCollector
+		(
+			List<RESULT> Results,
+			string actionNumber,
+			string actionDescription,
+			dynamic resultValue
+		)
+		{
+			WRAPPER.ManagedCommand(() =>
+			{
+				Results.Add(new RESULT()
+				{
+					ActionNumber = actionNumber,
+					ActionDescription = actionDescription,
+					Value = resultValue,
+				});
+			});
+		}
+
+		private void TestMethod
+		(
+			WORKFLOW workflow,
+			DOCUMENTER Documenter
+		//,bool LastMethodFailed
+		)
+		{
+			WRAPPER.ManagedCommand(() =>
+			{
+				if (MustTest)
+				{
+					TestResult = TESTS.NonNull(ResultValue);
+
+					//LastMethodFailed = !TestResult.PassesTest;
+
+					TestResult.MethodName = MethodName;
+					TestResult.MethodDescriptiveName = MethodDescriptiveName;
+					TestResult.ResultValue = ResultValue;
+					TestResult.ResultTypeName = ResultTypeName;
+					TestResult.MethodTime = MethodTime;
+					TestResult.MethodDeclaringTypeName = MethodDeclaringTypeName;
+					TestResult.MethodNamespace = MethodNamespace;
+					TestResult.MethodDeclaringTypeName = MethodTime;
+					TestResult.MethodArguments = MethodArguments;
+
+					Documenter.Document($"{DocumentationFileName}_TEST", TestResult);
+
+					//if (LastMethodFailed)
+					if (!TestResult.PassesTest)
+					{
+						ExecutionResultState = METHODSTATE.Failure;
+
+						new ERRORRESULT(workflow, $"{TestResult.ResultObvervation}\n\nFailed at: {MethodDescriptiveName}");
+					}
+				}
+			});
 		}
 	}
 }

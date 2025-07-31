@@ -23,215 +23,217 @@ namespace Revit.Actions
 		{
 			var uop = new WORKFLOW();
 
-			var referencePlanesCollector = uop.Run<FilteredElementCollector, CollectInstancesByTypeArguments>(
+			var referencePlanesCollector = 
+			uop.Run<FilteredElementCollector, CollectInstancesByTypeArguments>(
 				Collect.InstancesByType<ReferencePlane>,
 				new CollectInstancesByTypeArguments(document)
 				,"CollectReferencePlanes"
-				,TESTS.RevitApiCollector
 			);
 
-			var referencePlanes = uop.Run<List<Autodesk.Revit.DB.Element>, CastCollectorItemsToListArguments>(
+			var referencePlanes = 
+			uop.Run<List<Autodesk.Revit.DB.Element>, CastCollectorItemsToListArguments>(
 				Cast.CollectorItemsToList<Element>,
 				new CastCollectorItemsToListArguments(referencePlanesCollector)
 				,"CastElementsListFromCollector"
-				,TESTS.CastCollectorItemsToList
 			);
 
-			var nameParameter = uop.Run<Autodesk.Revit.DB.Parameter, ParameterGetByRevitUINameAndCategoryArguments>(
+			var nameParameter = 
+			uop.Run<Autodesk.Revit.DB.Parameter, ParameterGetByRevitUINameAndCategoryArguments>(
 				Parameter.GetByRevitUIName,
 				new ParameterGetByRevitUINameAndCategoryArguments(referencePlanes, "Name", BuiltInCategory.OST_GenericModel)
 				,"GetReferencePlanesNameParameter"
-				,TESTS.RevitApiElement
 			);
 
-			if (nameParameter == null)
+			if (nameParameter == null && !uop.LastMethodFailed)
 			{
-				new SUCCESSRESULT(uop, "Error al obtener el parámetro 'Name' de los planos de Referencia");
+				new ERRORRESULT(uop, "Error al obtener el parámetro 'Name' de los planos de Referencia");
 				return;
 			}
 
-			var libReferencePlaneElement = uop.Run<Autodesk.Revit.DB.Element, FilterElementsByParameterAndStringValueArguments>(
+			var libReferencePlaneElement = 
+			uop.Run<Autodesk.Revit.DB.Element, FilterElementsByParameterAndStringValueArguments>(
 				Filter.FirstElementByParameterAndStringValue,
 				new FilterElementsByParameterAndStringValueArguments(referencePlanes, nameParameter, "L.I.B")
-				, "GetlibReferencePlaneElement"
-				, TESTS.RevitApiElement
+				, "GetlibReferencePlaneElement"				
 			);
 
-			var ldp1ReferencePlaneElement = uop.Run<Autodesk.Revit.DB.Element, FilterElementsByParameterAndStringValueArguments>(
+			var ldp1ReferencePlaneElement = 
+			uop.Run<Autodesk.Revit.DB.Element, FilterElementsByParameterAndStringValueArguments>(
 				Filter.FirstElementByParameterAndStringValue,
 				new FilterElementsByParameterAndStringValueArguments(referencePlanes, nameParameter, "L.D.P 1")
-				, "Getldp1ReferencePlaneElement"
-				, TESTS.RevitApiElement
+				, "Getldp1ReferencePlaneElement"				
 			);
 
-			var ldp2ReferencePlaneElement = uop.Run<Autodesk.Revit.DB.Element, FilterElementsByParameterAndStringValueArguments>(
+			var ldp2ReferencePlaneElement =
+			uop.Run<Autodesk.Revit.DB.Element, FilterElementsByParameterAndStringValueArguments>(
 				Filter.FirstElementByParameterAndStringValue,
 				new FilterElementsByParameterAndStringValueArguments(referencePlanes, nameParameter, "L.D.P 2")
-				, "Getldp2ReferencePlaneElement"
-				, TESTS.RevitApiElement
+				, "Getldp2ReferencePlaneElement"				
 			);
 
-			var ldpfReferencePlaneElement = uop.Run<Autodesk.Revit.DB.Element, FilterElementsByParameterAndStringValueArguments>(
+			var ldpfReferencePlaneElement = 
+			uop.Run<Autodesk.Revit.DB.Element, FilterElementsByParameterAndStringValueArguments>(
 				Filter.FirstElementByParameterAndStringValue,
 				new FilterElementsByParameterAndStringValueArguments(referencePlanes, nameParameter, "L.D.P F")
-				, "GetldpfReferencePlaneElement"
-				, TESTS.RevitApiElement
+				, "GetldpfReferencePlaneElement"				
 			);
 
-			var allLevelsCollector = uop.Run<FilteredElementCollector, CollectInstancesByTypeArguments>(
+			var allLevelsCollector = 
+			uop.Run<FilteredElementCollector, CollectInstancesByTypeArguments>(
 				Collect.InstancesByType<Autodesk.Revit.DB.Level>,
 				new CollectInstancesByTypeArguments(document),
-				"CollectReferencePlanes"
-				, TESTS.RevitApiCollector
+				"CollectReferencePlanes"				
 			);
 
-			var levelElements = uop.Run<List<Element>, CastCollectorItemsToListArguments>(
+			var levelElements = 
+			uop.Run<List<Element>, CastCollectorItemsToListArguments>(
 				Cast.CollectorItemsToList<Element>,
 				new CastCollectorItemsToListArguments(allLevelsCollector),
-				"CastElementListFromCollector"
-				, TESTS.List
+				"CastElementListFromCollector"				
 			);
 
-			var levels = uop.Run<List<Autodesk.Revit.DB.Level>, CastElementsToTypeArguments>(
+			var levels = 
+			uop.Run<List<Autodesk.Revit.DB.Level>, CastElementsToTypeArguments>(
 				Cast.ElementsToType<Autodesk.Revit.DB.Level>,
 				new CastElementsToTypeArguments(levelElements),
-				"CastElementsToLevels"
-				, TESTS.List
+				"CastElementsToLevels"				
 			);
 
-			var levelsBellowElevationZero = uop.Run<List<Autodesk.Revit.DB.Level>, FilterLevelsByElevationArguments>(
+			var levelsBellowElevationZero = 
+			uop.Run<List<Autodesk.Revit.DB.Level>, FilterLevelsByElevationArguments>(
 				Filter.LevelsByElevation,
 				new FilterLevelsByElevationArguments(levels, 0.0, true),
 				"FilterLevelsBelowElevationZero"
-				,TESTS.List
 			);
 
-			var revitModelHasBasements = uop.Run<bool, CollectionContainsItemsArguments<Autodesk.Revit.DB.Level>>(
+			var revitModelHasBasements =
+			uop.Run<bool, CollectionContainsItemsArguments<Autodesk.Revit.DB.Level>>(
 				Collection.ContainsItems<Autodesk.Revit.DB.Level>,
 				new CollectionContainsItemsArguments<Autodesk.Revit.DB.Level>(levelsBellowElevationZero),
 				"ValidateIfModelHasBasements"
-				,TESTS.SimpleValue
 			);
 
-			if (revitModelHasBasements == false)
+			if (revitModelHasBasements == false && !uop.LastMethodFailed)
 			{
-				TaskDialog.Show("Success", "No hay subsuelos que validar.");
+				new SUCCESSRESULT(uop, "No hay subsuelos que validar.");
 				uop.DocumentResults();
 				return;
 			}
 
-			var allRoomsCollector = uop.Run<Autodesk.Revit.DB.FilteredElementCollector, CollectInstancesByTypeArguments>(
+			var allRoomsCollector = 
+			uop.Run<Autodesk.Revit.DB.FilteredElementCollector, CollectInstancesByTypeArguments>(
 				Collect.InstancesByType<Autodesk.Revit.DB.SpatialElement>,
 				new CollectInstancesByTypeArguments(document),
 				"CollectAllRooms"
-				,TESTS.RevitApiCollector
 			);
 
-			var allRooms = uop.Run<List<Autodesk.Revit.DB.Element>, CastCollectorItemsToListArguments>(
+			var allRooms = 
+			uop.Run<List<Autodesk.Revit.DB.Element>, CastCollectorItemsToListArguments>(
 				Cast.CollectorItemsToList<Element>,
 				new CastCollectorItemsToListArguments(allRoomsCollector),
 				"CastRoomListFromCollector"
-				,TESTS.CastCollectorItemsToList
 			);
 
-			var modelHasRooms = uop.Run<bool, CollectionContainsItemsArguments<Autodesk.Revit.DB.Element>>(
+			var modelHasRooms = 
+			uop.Run<bool, CollectionContainsItemsArguments<Autodesk.Revit.DB.Element>>(
 				Collection.ContainsItems<Autodesk.Revit.DB.Element>,
 				new CollectionContainsItemsArguments<Autodesk.Revit.DB.Element>(allRooms),
-				"ValidateIfModelHasRooms"
-				, TESTS.SimpleValue
+				"ValidateIfModelHasRooms"				
 			);
 
-			if (modelHasRooms == null || modelHasRooms == false)
+			if (modelHasRooms == false && !uop.LastMethodFailed)
 			{
-				TaskDialog.Show("Error", "El modelo no tiene instancias de 'Rooms'.");
+				new ERRORRESULT(uop, "El modelo no tiene instancias de 'Rooms'.");
 				uop.DocumentResults();
 				return;
 			}
 
-			var parkingIdentifyerParameter = uop.Run<Autodesk.Revit.DB.Parameter, ParameterGetByRevitUINameAndCategoryArguments>(
+			var parkingIdentifyerParameter =
+			uop.Run<Autodesk.Revit.DB.Parameter, ParameterGetByRevitUINameAndCategoryArguments>(
 				Parameter.GetByRevitUINameAndCategory,
 				new ParameterGetByRevitUINameAndCategoryArguments(allRooms, "MC_Tipo de Local/Área Descubierta", BuiltInCategory.OST_Rooms),
-				"Get_MC_Tipo_de_Local-Area_Descubierta_Parameter" 
-				, TESTS.RevitApiElement
+				"Get_MC_Tipo_de_Local-Area_Descubierta_Parameter" 				
 			);
 
-			if (parkingIdentifyerParameter == null)
+			if (parkingIdentifyerParameter == null && !uop.LastMethodFailed)
 			{
-				TaskDialog.Show("Success", "Error obteniendo el parámetro 'Get_MC_Tipo de Local/Área Descubierta_Parameter'.");
+				new ERRORRESULT(uop, "Error obteniendo el parámetro 'Get_MC_Tipo de Local/Área Descubierta_Parameter'.");
 				uop.DocumentResults();
 				return;
 			}
 
-			var carsParkingRooms = uop.Run<List<Autodesk.Revit.DB.Element>, FilterElementsByParameterAndStringValueArguments>(
+			var carsParkingRooms = 
+			uop.Run<List<Autodesk.Revit.DB.Element>, FilterElementsByParameterAndStringValueArguments>(
 				Filter.ElementsByParameterAndStringValue,
 				new FilterElementsByParameterAndStringValueArguments(allRooms, parkingIdentifyerParameter, "Estacionamiento Vehicular"),
-				"FilterCarsParkingRooms"
-				, TESTS.List
+				"FilterCarsParkingRooms"				
 			);
 
-			var byciclesParkingRooms = uop.Run<List<Autodesk.Revit.DB.Element>, FilterElementsByParameterAndStringValueArguments>(
+			var byciclesParkingRooms = 
+			uop.Run<List<Autodesk.Revit.DB.Element>, FilterElementsByParameterAndStringValueArguments>(
 				Filter.ElementsByParameterAndStringValue,
 				new FilterElementsByParameterAndStringValueArguments(allRooms, parkingIdentifyerParameter, "Estacionamiento de Bicicletas"),
-				"FilterByciclesParkingRooms"
-				, TESTS.List
+				"FilterByciclesParkingRooms"				
 			);
 
-			var revitModelHasCarParkingRooms = uop.Run<bool, CollectionContainsItemsArguments<Autodesk.Revit.DB.Element>>(
+			var revitModelHasCarParkingRooms = 
+			uop.Run<bool, CollectionContainsItemsArguments<Autodesk.Revit.DB.Element>>(
 				Collection.ContainsItems<Autodesk.Revit.DB.Element>,
 				new CollectionContainsItemsArguments<Autodesk.Revit.DB.Element>(carsParkingRooms),
-				"ValidateIfModelHasCarParkingRooms"
-				, TESTS.SimpleValue
+				"ValidateIfModelHasCarParkingRooms"				
 			);
 
-			var revitModelHasBicyclesParkingRooms = uop.Run<bool, CollectionContainsItemsArguments<Autodesk.Revit.DB.Element>>(
+			var revitModelHasBicyclesParkingRooms = 
+			uop.Run<bool, CollectionContainsItemsArguments<Autodesk.Revit.DB.Element>>(
 				Collection.ContainsItems<Autodesk.Revit.DB.Element>,
 				new CollectionContainsItemsArguments<Autodesk.Revit.DB.Element>(byciclesParkingRooms),
-				"ValidateIfModelHasBicyclesParkingRooms"
-				, TESTS.SimpleValue
+				"ValidateIfModelHasBicyclesParkingRooms"				
 			);
 
 			if (
 				!revitModelHasCarParkingRooms &&
-				!revitModelHasBicyclesParkingRooms
+				!revitModelHasBicyclesParkingRooms &&
+				!uop.LastMethodFailed
 			)
 			{
-				TaskDialog.Show("Success", "No hay instancias de 'Room' que validar");
+				new SUCCESSRESULT(uop, "No hay instancias de 'Room' que validar");
 				uop.DocumentResults();
 				return;
 			}
 
-			var LIBvsLDP1IntersectionPoint = uop.Run<Autodesk.Revit.DB.XYZ, IntersectGetXYZFromReferencePlanePairIntersectionArguments>(
+			var LIBvsLDP1IntersectionPoint = 
+			uop.Run<Autodesk.Revit.DB.XYZ, IntersectGetXYZFromReferencePlanePairIntersectionArguments>(
 				Intersect.GetXYZFromReferencePlanePairIntersection,
 				new IntersectGetXYZFromReferencePlanePairIntersectionArguments((ReferencePlane)libReferencePlaneElement, (ReferencePlane)ldp1ReferencePlaneElement),
-				"GetLFD-LDP1IntersectionPointByPlanePairIntersection"
-				, TESTS.RevitApiElement
+				"GetLFD-LDP1IntersectionPointByPlanePairIntersection"				
 			);
 
-			var LIBvsLDP2IntersectionPoint = uop.Run<Autodesk.Revit.DB.XYZ, IntersectGetXYZFromReferencePlanePairIntersectionArguments>(
+			var LIBvsLDP2IntersectionPoint = 
+			uop.Run<Autodesk.Revit.DB.XYZ, IntersectGetXYZFromReferencePlanePairIntersectionArguments>(
 				Intersect.GetXYZFromReferencePlanePairIntersection,
 				new IntersectGetXYZFromReferencePlanePairIntersectionArguments((ReferencePlane)libReferencePlaneElement, (ReferencePlane)ldp2ReferencePlaneElement),
-				"GetLFD-LDP2IntersectionPointByPlanePairIntersection"
-				, TESTS.RevitApiElement
+				"GetLFD-LDP2IntersectionPointByPlanePairIntersection"				
 			);
 
-			var LDPFvsLDP1IntersectionPoint = uop.Run<Autodesk.Revit.DB.XYZ, IntersectGetXYZFromReferencePlanePairIntersectionArguments>(
+			var LDPFvsLDP1IntersectionPoint =
+			uop.Run<Autodesk.Revit.DB.XYZ, IntersectGetXYZFromReferencePlanePairIntersectionArguments>(
 				Intersect.GetXYZFromReferencePlanePairIntersection,
 				new IntersectGetXYZFromReferencePlanePairIntersectionArguments((ReferencePlane)ldpfReferencePlaneElement, (ReferencePlane)ldp1ReferencePlaneElement),
-				"GetLDPF-LDP1IntersectionPointByPlanePairIntersection"
-				, TESTS.RevitApiElement
+				"GetLDPF-LDP1IntersectionPointByPlanePairIntersection"				
 			);
 
-			var LDPFvsLDP2IntersectionPoint = uop.Run<Autodesk.Revit.DB.XYZ, IntersectGetXYZFromReferencePlanePairIntersectionArguments>(
+			var LDPFvsLDP2IntersectionPoint = 
+			uop.Run<Autodesk.Revit.DB.XYZ, IntersectGetXYZFromReferencePlanePairIntersectionArguments>(
 				Intersect.GetXYZFromReferencePlanePairIntersection,
 				new IntersectGetXYZFromReferencePlanePairIntersectionArguments((ReferencePlane)ldpfReferencePlaneElement, (ReferencePlane)ldp2ReferencePlaneElement),
-				"GetLDPF-LDP2IntersectionPointByPlanePairIntersection"
-				, TESTS.RevitApiElement
+				"GetLDPF-LDP2IntersectionPointByPlanePairIntersection"				
 			);
 
 
 			if (!uop.LastMethodFailed)
 			{
 				new SUCCESSRESULT(uop, "Flujo de trabajo completado.");
+				uop.DocumentResults();
 			}
 		}
 	}
